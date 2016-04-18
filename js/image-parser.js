@@ -36,7 +36,7 @@ var ImagePaster = function () {
 			<span aria-hidden="true" style="margin-right:5px;">&times;</span>
 			</button>
 			<span>
-			图片上传成功，如果未自动粘贴请再次按Ctrl+V完成图片粘贴。
+			图片上传成功，请点击回车键完成粘贴。
 			</span>
 			</div>
 			 */
@@ -144,10 +144,11 @@ var ImagePaster = function () {
 	//设置系统剪切板内容
 	function setPasteContent(content) {
 		console.log(content);
+		/*
 		var target = $(document.activeElement);
 		$('body').append('<textarea id="tmpPasteText2016" style="height:0;width:0;border:0;"></textarea>');
 		var tmp = $('#tmpPasteText2016');
-    var y=$(document).scrollTop();
+		var y=$(document).scrollTop();
 		tmp.focus();
 		tmp.text(content);
 		tmp.select();
@@ -155,12 +156,22 @@ var ImagePaster = function () {
 		console.log(res);
 		tmp.remove();
 		$(document).scrollTop(y);
-    me.onEndSetClipboard(target);
-    if(m_autoPaste==true&&m_isAutoPasting==false)
-    {
-      m_isAutoPasting=true;
-      document.execCommand('paste');
-    }
+		me.onEndSetClipboard(target);
+		if(m_autoPaste==true&&m_isAutoPasting==false)
+		{
+		  m_isAutoPasting=true;
+		  document.execCommand('paste');
+		}
+		*/
+		//搜狗浏览器不支持自动粘贴，只能按回车粘贴
+		//搜狗六年
+		var ele=$('textarea.ace_text-input');
+		if(ele.length>0)
+		{
+			ele.val("  "+content);
+			ele.focus();
+			ele.trigger('propertychange');
+		}
 	}
 }
 
@@ -168,18 +179,18 @@ $(function () {
 	var paster = new ImagePaster();
 	//针对不同网站进行不同的初始化
 	switch (true) {
-	case location.href.startsWith('https://www.zybuluo.com'):
+	case location.href.indexOf('zybuluo.com')>-1:
 		paster.Init('#editor-column',true);
     paster.onEndSetClipboard=function(target)
     {
       $('textarea.ace_text-input').focus();
     }
 		break;
-	case location.href.startsWith('http://write.blog.csdn.net'):
+	case location.href.indexOf('http://write.blog.csdn.net')>-1:
 		paster.Init('.editor-content',false); //在csdn上无法恢复光标原位置，因为它是一个div
 
 		break;
-	case location.href.startsWith('https://github.com'):
+	case location.href.indexOf('https://github.com')>-1:
 		paster.Init('.commit-create',true);
     paster.onEndSetClipboard=function(target)
     {

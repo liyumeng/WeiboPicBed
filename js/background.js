@@ -50,15 +50,54 @@ function onStorageChange() {
 
 var eventFilter = {
 	url : [{
-			urlPrefix : "https://github.com/"
+			urlPrefix : "github.com"
 		},{
-			urlPrefix : "https://www.zybuluo.com/mdeditor"
+			urlPrefix : "zybuluo.com/mdeditor"
 		},{
 			urlPrefix:"http://write.blog.csdn.net/mdeditor"
 		}
 	]
 };
+
+chrome.tabs.onUpdated.addListener(function(tabId,changeInfo,tab){
+
+	if(tab.status=="complete")
+	{
+		var found=false;
+		for(var i=0;i<eventFilter.url.length;i++)
+		{
+			if(tab.url.indexOf(eventFilter.url[i].urlPrefix)>-1)
+			{
+				found=true;
+				break;
+			}
+		}
+		if(found==true)
+		{	
+			chrome.tabs.insertCSS(tab.id, {
+				file : "css/image-parser.css"
+			});
+			chrome.tabs.insertCSS(tab.id, {
+				file : "css/sweet-alert.min.css"
+			});
+			chrome.tabs.executeScript(tab.id, {
+				file : "js/jquery.min.js"
+			});
+			chrome.tabs.executeScript(tab.id, {
+				file : "js/bootstrap.min.js"
+			});
+			chrome.tabs.executeScript(tab.id, {
+				file : "js/sweet-alert.min.js"
+			});	
+			chrome.tabs.executeScript(tab.id, {
+				file : "js/image-parser.js"
+			});
+		}
+	}
+});
 ///通过设定eventFilter，使以下代码只对指定网站生效，减少内存占用
+//搜狗浏览器不支持这种方式
+/*
 chrome.webNavigation.onCommitted.addListener(function (tab) {
 	//console.log(tab);
 	chrome.tabs.insertCSS(tab.id, {
@@ -80,6 +119,7 @@ chrome.webNavigation.onCommitted.addListener(function (tab) {
 		file : "js/image-parser.js"
 	});
 }, eventFilter);
+*/
 
 chrome.extension.onMessage.addListener(function (request, sender, sendResponse) {
 	switch (request.message) {
